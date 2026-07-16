@@ -94,7 +94,8 @@ function BinaryIntro({ onComplete }: { onComplete: () => void }) {
     if (completionRef.current) return;
     completionRef.current = true;
     setLeaving(true);
-    window.setTimeout(onComplete, 900);
+    const exitDelay = window.matchMedia("(pointer: coarse)").matches ? 420 : 900;
+    window.setTimeout(onComplete, exitDelay);
   }, [onComplete]);
 
   useEffect(() => {
@@ -107,6 +108,7 @@ function BinaryIntro({ onComplete }: { onComplete: () => void }) {
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
+    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
 
     if (reducedMotion) {
       const timer = window.setTimeout(finish, 500);
@@ -227,15 +229,17 @@ function BinaryIntro({ onComplete }: { onComplete: () => void }) {
       lastTime = now;
       const elapsed = (now - startedAt) / 1000;
 
-      if (elapsed > 6 && targetProgress < 0.18) {
+      if (!coarsePointer && elapsed > 6 && targetProgress < 0.18) {
         targetProgress = Math.min(0.18, targetProgress + delta * 0.018);
       }
-      if (window.matchMedia("(pointer: coarse)").matches && elapsed > 1.2) {
-        targetProgress = Math.min(1, targetProgress + delta * 0.13);
+      if (coarsePointer) {
+        const automaticProgress = clamp((elapsed - 0.15) / 1.35, 0, 1);
+        targetProgress = Math.max(targetProgress, automaticProgress);
       }
 
       assembly +=
-        (targetProgress - assembly) * (1 - Math.exp(-delta * 1.85));
+        (targetProgress - assembly) *
+        (1 - Math.exp(-delta * (coarsePointer ? 5.2 : 1.85)));
       const resolved = smoothstep(assembly);
 
       context.clearRect(0, 0, width, height);
@@ -278,9 +282,11 @@ function BinaryIntro({ onComplete }: { onComplete: () => void }) {
         lastUiUpdate = now;
       }
 
-      if (targetProgress >= 1 && assembly > 0.975) {
+      const completionThreshold = coarsePointer ? 0.94 : 0.975;
+      if (targetProgress >= 1 && assembly > completionThreshold) {
         if (!completedAt) completedAt = now;
-        if (now - completedAt > 1450) finish();
+        const completionHold = coarsePointer ? 200 : 1450;
+        if (now - completedAt > completionHold) finish();
       }
 
       frame = window.requestAnimationFrame(draw);
@@ -288,16 +294,20 @@ function BinaryIntro({ onComplete }: { onComplete: () => void }) {
 
     resize();
     window.addEventListener("resize", resize);
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    if (!coarsePointer) {
+      window.addEventListener("pointermove", onPointerMove, { passive: true });
+      window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    }
     frame = window.requestAnimationFrame(draw);
 
     return () => {
       document.body.classList.remove("intro-active");
       window.cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerdown", onPointerDown);
+      if (!coarsePointer) {
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerdown", onPointerDown);
+      }
     };
   }, [finish]);
 
@@ -316,7 +326,10 @@ function BinaryIntro({ onComplete }: { onComplete: () => void }) {
       </div>
       <div className="intro-brand">bformat / resolving identity</div>
       <div className="intro-guide" aria-live="polite">
-        <span>move to reconstruct</span>
+        <span>
+          <span className="intro-guide-pointer">move to reconstruct</span>
+          <span className="intro-guide-touch">resolving identity</span>
+        </span>
         <div className="intro-progress" aria-hidden="true">
           <i style={{ transform: `scaleX(${clamp(progress, 0, 1)})` }} />
         </div>
@@ -331,6 +344,7 @@ function BinaryIntro({ onComplete }: { onComplete: () => void }) {
 
 function SiteContent() {
   const moveHackerGlow = (event: ReactPointerEvent<HTMLElement>) => {
+    if (event.pointerType === "touch") return;
     const bounds = event.currentTarget.getBoundingClientRect();
     event.currentTarget.style.setProperty(
       "--hacker-x",

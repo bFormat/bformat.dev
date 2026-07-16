@@ -39,6 +39,7 @@ body {
 
 body.intro-active {
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 a {
@@ -69,6 +70,8 @@ a {
     radial-gradient(circle at 50% 50%, rgba(65, 147, 98, 0.16), transparent 52%),
     var(--green-deep);
   color: #e7ffe7;
+  overscroll-behavior: none;
+  touch-action: none;
   transition: opacity 0.9s cubic-bezier(0.65, 0, 0.15, 1),
     filter 0.9s ease,
     transform 0.9s cubic-bezier(0.65, 0, 0.15, 1);
@@ -139,6 +142,10 @@ a {
   align-items: center;
   gap: 18px;
   opacity: 0.78;
+}
+
+.intro-guide-touch {
+  display: none;
 }
 
 .intro-progress {
@@ -1299,6 +1306,64 @@ a {
   .hacker-record time {
     grid-column: 2;
     grid-row: 3;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .binary-intro {
+    transition-duration: 420ms;
+  }
+
+  .intro-guide-pointer {
+    display: none;
+  }
+
+  .intro-guide-touch {
+    display: inline;
+  }
+
+  [data-reveal] {
+    transform: none;
+    transition: opacity 360ms ease;
+  }
+
+  .profile-chip:hover {
+    transform: rotate(-1.4deg);
+  }
+
+  .profile-chip:hover .profile-avatar::before {
+    transform: scale(1.06);
+  }
+
+  .primary-link:hover {
+    background: var(--ink);
+    transform: none;
+  }
+
+  .primary-link:hover span,
+  .project-row:hover .project-metric b {
+    transform: none;
+  }
+
+  .project-row:hover {
+    padding-right: 0;
+    padding-left: 0;
+    color: inherit;
+  }
+
+  .project-row:hover::before {
+    transform: translateY(101%);
+  }
+}
+
+@media (max-width: 720px) and (hover: none),
+  (max-width: 720px) and (pointer: coarse) {
+  .project-row:hover {
+    padding-right: 40px;
   }
 }
 
