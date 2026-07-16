@@ -25,4 +25,21 @@ timeout \
   "${SITES_BUILD_TIMEOUT:-3m}" \
   "${vinext}" build
 
+node --input-type=module - "${SITES_PROJECT_ROOT}/dist/server/index.js" <<'NODE'
+import { readFile, writeFile } from "node:fs/promises";
+
+const workerPath = process.argv[2];
+const worker = await readFile(workerPath, "utf8");
+const normalizedWorker = worker.replaceAll(
+  "/workspace/sites/bformat-dev/.vinext/fonts/",
+  "/assets/_vinext_fonts/",
+);
+
+if (normalizedWorker === worker) {
+  throw new Error("Expected Vinext font URLs were not found in the Worker artifact");
+}
+
+await writeFile(workerPath, normalizedWorker);
+NODE
+
 "${script_dir}/validate-artifact.sh"
