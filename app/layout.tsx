@@ -16,9 +16,6 @@ export const metadata: Metadata = {
   title: "bformat.dev — 전승민",
   description:
     "AI 업무역량 평가·훈련 플랫폼을 만들고, 학생들에게 알고리즘과 AI를 가르치는 전승민의 개인 페이지.",
-  other: {
-    "codex-preview": "development",
-  },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
