@@ -30,6 +30,22 @@ test("renders production HTML with deployable font URLs", async () => {
   );
   const html = await response.text();
   assert.match(html, /<title>bformat\.dev — 전승민<\/title>/i);
+  assert.match(
+    html,
+    /<meta property="og:image" content="https:\/\/bformat\.dev\/og-image\.png"\/>/i,
+  );
+  assert.match(
+    html,
+    /<meta name="twitter:card" content="summary_large_image"\/>/i,
+  );
+  assert.match(
+    html,
+    /<link rel="apple-touch-icon" href="https:\/\/bformat\.dev\/apple-touch-icon\.png"[^>]*>/i,
+  );
+  assert.match(
+    html,
+    /<link rel="manifest" href="https:\/\/bformat\.dev\/site\.webmanifest"\/>/i,
+  );
   assert.match(html, /\/assets\/_vinext_fonts\//);
   assert.doesNotMatch(html, /\/workspace\/sites\/bformat-dev\//);
   assert.doesNotMatch(html, codexPreviewMeta);
