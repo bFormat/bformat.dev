@@ -34,7 +34,8 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-bformat-20260716.png",
+        type: "image/png",
         width: 1200,
         height: 630,
         alt: "bformat.dev — 전승민 소개",
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     title: "bformat.dev — 전승민",
     description:
       "AI 업무역량 평가·훈련 플랫폼을 만들고, 알고리즘과 AI를 가르칩니다.",
-    images: ["/og-image.png"],
+    images: ["/og-bformat-20260716.png"],
   },
   icons: {
     icon: [

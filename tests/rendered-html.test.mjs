@@ -32,7 +32,11 @@ test("renders production HTML with deployable font URLs", async () => {
   assert.match(html, /<title>bformat\.dev — 전승민<\/title>/i);
   assert.match(
     html,
-    /<meta property="og:image" content="https:\/\/bformat\.dev\/og-image\.png"\/>/i,
+    /<meta property="og:image" content="https:\/\/bformat\.dev\/og-bformat-20260716\.png"\/>/i,
+  );
+  assert.match(
+    html,
+    /<meta property="og:image:type" content="image\/png"\/>/i,
   );
   assert.match(
     html,
